@@ -4,13 +4,15 @@ import { SignupDto } from '../dtos/signup.dto';
 import * as bcrypt from 'bcryptjs';
 import { UserType } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
-import * as process from 'process';
 import { SigninDto } from '../dtos/signin.dto';
 @Injectable()
 export class AuthService {
   constructor(private prismaService: PrismaService) {}
 
-  async signup({ email, password, name, telephone }: SignupDto) {
+  async signup(
+    { email, password, name, telephone }: SignupDto,
+    userType: UserType,
+  ) {
     const user = await this.prismaService.user.findUnique({ where: { email } });
 
     if (user) {
@@ -25,12 +27,12 @@ export class AuthService {
         password: hash,
         name,
         telephone,
-        user_type: UserType.BUYER,
+        user_type: userType,
       },
     });
 
     const token = await this.generateToken({ name, id: newUser.id });
-    return { token };
+    return { token, user: { user_type: newUser.user_type } };
   }
 
   async signin({ email, password }: SigninDto) {
@@ -55,5 +57,18 @@ export class AuthService {
     return jwt.sign({ name, id }, process.env.JWT_SECRET, {
       expiresIn: '5 days',
     });
+  }
+
+  generateProductKey({
+    email,
+    userType,
+  }: {
+    email: string;
+    userType: UserType;
+  }) {
+    const key = process.env.PRODUCT_KEY_SECRET;
+
+    const string = `${email}-${userType}-${key}`;
+    return bcrypt.hash(string, 10);
   }
 }
