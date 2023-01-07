@@ -16,19 +16,19 @@ model User {
   telephone        String
   email            String    @unique
   password         String
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
   user_type        UserType
   homes            Home[]
   buyer_messages   Message[] @relation("buyer_messages")
   realtor_messages Message[] @relation("realtor_messages")
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
 }
 
 model Home {
   id                  Int          @id @default(autoincrement())
   address             String
   number_of_bedrooms  Int
-  number_of_bathrooms Float
+  number_of_bathrooms Int
   city                String
   listed_date         DateTime     @default(now())
   price               Float
@@ -38,27 +38,33 @@ model Home {
   realtor_id          Int
   realtor             User         @relation(fields: [realtor_id], references: [id])
   messages            Message[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Image {
-  id         Int      @id @default(autoincrement())
-  imgUrl     String
+  id      Int    @id @default(autoincrement())
+  imgUrl  String
+  home_id Int
+  home    Home   @relation(fields: [home_id], references: [id])
+
+  created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  user_type  UserType
-  home_id    Int
-  home       Home     @relation(fields: [home_id], references: [id])
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   message    String
-  updated_at DateTime @updatedAt
   home_id    Int
-  home       Home     @relation(fields: [home_id], references: [id])
+  home       Home   @relation(fields: [home_id], references: [id])
   realtor_id Int
-  realtor    User     @relation("realtor_messages", fields: [realtor_id], references: [id])
+  realtor    User   @relation("realtor_messages", fields: [realtor_id], references: [id])
   buyer_id   Int
-  buyer      User     @relation("buyer_messages", fields: [buyer_id], references: [id])
+  buyer      User   @relation("buyer_messages", fields: [buyer_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 enum PropertyType {
