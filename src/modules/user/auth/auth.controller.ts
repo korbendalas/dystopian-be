@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseEnumPipe,
   Post,
@@ -12,6 +13,7 @@ import { SigninDto } from '../dtos/signin.dto';
 import { GenerateProductKeyDto } from '../dtos/generateProductKey.dto';
 import { UserType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { User, UserDecoratorInterface } from '../decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -51,5 +53,10 @@ export class AuthController {
   @Post('/key')
   generateProductKey(@Body() { userType, email }: GenerateProductKeyDto) {
     return this.authService.generateProductKey({ userType, email });
+  }
+
+  @Get('/me')
+  async me(@User() user: UserDecoratorInterface) {
+    return user;
   }
 }
