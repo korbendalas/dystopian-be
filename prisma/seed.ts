@@ -1,87 +1,75 @@
-import { PrismaClient, PropertyType, UserType } from '@prisma/client';
-import { faker } from '@faker-js/faker';
-import * as bcrypt from 'bcryptjs';
-import { random, sample } from 'lodash';
-
-const createBuyerUser = async (
-  index: number,
-  userType: UserType = UserType.BUYER,
-) => {
-  const name = 'testuser' + index + 1;
-  const password = await bcrypt.hash('test@123', 10);
-  return {
-    name: name,
-    email: `${name}@mail.com`,
-    password: password,
-    telephone: faker.phone.number(),
-    user_type: userType,
-  };
-};
-
-const createHomes = async (realtorId) => {
-  return {
-    address: faker.address.streetAddress(),
-    number_of_bedrooms: Number(faker.random.numeric()),
-    number_of_bathrooms: Number(faker.random.numeric()),
-    city: faker.address.city(),
-    listed_date: faker.date.past(),
-    price: Number(faker.commerce.price()),
-    land_size: Number(faker.random.numeric(100)),
-    propertyType: sample([PropertyType.CONDO, PropertyType.RESIDENTAL]),
-    // images              Image[]
-    realtor_id: realtorId,
-  };
-};
-
-const createImages = async (homeId) => {
-  return {
-    imgUrl: faker.image.city(),
-    home_id: homeId,
-  };
-};
+import { PrismaClient, PropertyType } from '@prisma/client';
+import {
+  rand,
+  randAddress,
+  randBetweenDate,
+  randCity,
+  randFloat,
+  randNumber,
+  randPhoneNumber,
+  randUser,
+} from '@ngneat/falso';
 
 const prisma = new PrismaClient();
 
-// The transaction runs synchronously so deleteUsers must run last.
+async function seed() {
+  // Generate mock data for users
+  const users = [];
+  for (let i = 0; i < 100; i++) {
+    const user = {
+      name: randUser().firstName,
+      telephone: randPhoneNumber(),
+      email: 'testuser' + i + '@example.com',
+      password: 'test@123',
+      user_type: rand(['BUYER', 'REALTOR', 'ADMIN']),
+    };
 
-async function main() {
-  // await prisma.$queryRawUnsafe('DROP schema public CASCADE');
-
-  console.log('Seeding...');
-  /// --------- Users ---------------
-  for (let i = 0; i < 10; i++) {
-    await prisma.user.create({ data: await createBuyerUser(i) });
+    users.push(user);
   }
 
-  console.log('INSERTING BUYERS.....');
-  // const Buyers = await prisma.user.createMany({
-  //   data: range(10).map((item) => item),
-  // });
-
-  console.log('DONE - INSERTING BUYERS!');
-
-  for (let i = 10; i < 20; i++) {
-    await prisma.user.create({
-      data: await createBuyerUser(i, UserType.REALTOR),
-    });
+  // Generate mock data for homes
+  const homes = [];
+  for (let i = 0; i < 20; i++) {
+    const home = {
+      address: randAddress().street,
+      number_of_bedrooms: randNumber({ min: 1, max: 5 }),
+      number_of_bathrooms: randNumber({ min: 1, max: 3 }),
+      city: randCity(),
+      listed_date: randBetweenDate({
+        from: new Date(2022, 0, 1),
+        to: new Date(),
+      }),
+      price: randFloat({ min: 100000, max: 1000000, precision: 2 }),
+      land_size: randFloat({ min: 500, max: 2000, precision: 2 }),
+      propertyType: rand([PropertyType.RESIDENTAL, PropertyType.CONDO]),
+      realtor_id: randNumber({ min: 1, max: users.length }),
+    };
+    homes.push(home);
   }
 
+  // Generate mock data for images
+  const images = [];
   for (let i = 0; i < 50; i++) {
-    const home = await prisma.home.create({
-      // @ts-ignore
-      data: await createHomes(random(1, 6)),
+    const image = {
+      imgUrl: `https://example.com/image-${i}.jpg`,
+      home_id: randNumber({ min: 1, max: homes.length }),
+    };
+    images.push(image);
+  }
+
+  try {
+    const createdUsers = await prisma.user.createMany({
+      data: users,
     });
 
-    for (let j = 0; j < 5; j++) {
-      // @ts-ignore
-      await prisma.image.create({ data: await createImages(home.id) });
-    }
+    const createdHomes = await prisma.home.createMany({ data: homes });
+    const createdImages = await prisma.image.createMany({ data: images });
+    console.log('Mock data seeded successfully:');
+  } catch (error) {
+    console.error('Error seeding mock data:', error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-main()
-  .catch((e) => console.error(e))
-  .finally(async () => {
-    console.log('SEEDING COMPLETE!!');
-    await prisma.$disconnect();
-  });
+seed();
