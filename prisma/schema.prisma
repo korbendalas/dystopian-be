@@ -71,9 +71,3 @@ enum PropertyType {
   RESIDENTAL
   CONDO
 }
-
-enum UserType {
-  BUYER
-  REALTOR
-  ADMIN
-}

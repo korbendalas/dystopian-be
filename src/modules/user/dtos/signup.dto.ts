@@ -15,7 +15,7 @@ export class SignupDto {
   // @Matches(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/)
 
   @IsNotEmpty()
-  telephone: string;
+  phone: string;
 
   @IsEmail()
   email: string;

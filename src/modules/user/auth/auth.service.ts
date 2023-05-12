@@ -1,19 +1,28 @@
 import { ConflictException, HttpException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+// import { PrismaService } from '../../prisma/prisma.service';
 import { SignupDto } from '../dtos/signup.dto';
 import * as bcrypt from 'bcryptjs';
-import { UserType } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 import { SigninDto } from '../dtos/signin.dto';
+import { UserType } from '@api/modules/user/types';
+import { Sequelize } from 'sequelize-typescript';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from '@api/modules/user/user.entity';
+
 @Injectable()
 export class AuthService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    @InjectModel(User)
+    private userModel: typeof User,
+  ) {}
 
   async signup(
-    { email, password, name, telephone }: SignupDto,
+    { email, password, name, phone }: SignupDto,
     userType: UserType,
   ) {
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.userModel.findOne({
+      where: { email },
+    });
 
     if (user) {
       throw new ConflictException();
@@ -21,14 +30,12 @@ export class AuthService {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const newUser = await this.prismaService.user.create({
-      data: {
-        email,
-        password: hash,
-        name,
-        telephone,
-        user_type: userType,
-      },
+    const newUser = await this.userModel.create({
+      email,
+      password: hash,
+      name,
+      phone,
+      user_type: 1,
     });
 
     const token = await this.generateToken({ name, id: newUser.id });
@@ -36,7 +43,9 @@ export class AuthService {
   }
 
   async signin({ email, password }: SigninDto) {
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.userModel.findOne({
+      where: { email },
+    });
 
     if (!user) {
       throw new HttpException('Invalid Credentials 1', 400);
@@ -55,7 +64,7 @@ export class AuthService {
 
   async generateToken({ name, id }) {
     return jwt.sign({ name, id }, process.env.JWT_SECRET, {
-      expiresIn: '5 days',
+      expiresIn: '155 days',
     });
   }
 

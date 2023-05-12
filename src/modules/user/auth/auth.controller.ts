@@ -11,14 +11,21 @@ import { AuthService } from './auth.service';
 import { SignupDto } from '../dtos/signup.dto';
 import { SigninDto } from '../dtos/signin.dto';
 import { GenerateProductKeyDto } from '../dtos/generateProductKey.dto';
-import { UserType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { User, UserDecoratorInterface } from '../decorators/user.decorator';
+import {
+  CurrentUser,
+  UserDecoratorInterface,
+} from '../decorators/user.decorator';
+import { UserType } from '@api/modules/user/types';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  async test() {
+    return 'test';
+  }
   @Post('/signup/:userType')
   async signup(
     @Body() body: SignupDto,
@@ -32,6 +39,7 @@ export class AuthController {
       const key = process.env.PRODUCT_KEY_SECRET;
 
       const validProductKey = `${body.email}-${userType}-${key}`;
+      console.log('validProductKey', validProductKey);
       const isValidProductKey = await bcrypt.compare(
         validProductKey,
         body.productKey,
@@ -41,7 +49,7 @@ export class AuthController {
         throw new UnauthorizedException();
       }
     }
-
+    console.log('body', body, userType);
     return this.authService.signup(body, userType);
   }
 
@@ -56,7 +64,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  async me(@User() user: UserDecoratorInterface) {
+  async me(@CurrentUser() user: UserDecoratorInterface) {
     return user;
   }
 }

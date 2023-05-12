@@ -17,12 +17,17 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
 
     "paths": {
       "@api/*": [
         "src/*"
       ],
-      "@database/*" : ["src/modules/database/*"]
-    }
-    }
+      "@database/*" : ["src/modules/database/*"],
+      "@config/*" : ["config/index", "config/*"],
+      "@config" : ["config", "config/*"]
+    },
+
+    },
+
 }

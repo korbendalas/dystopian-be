@@ -1,27 +1,25 @@
-import {IDatabaseConfig} from "@database/interfaces";
+import { Dialect } from 'sequelize';
+import { ConfigService } from '@nestjs/config';
+import { User } from '@api/modules/user/user.entity';
 
-export const databaseConfig: IDatabaseConfig = {
-    development: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME_DEVELOPMENT,
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        dialect: process.env.DB_DIALECT,
-    },
-    test: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME_TEST,
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        dialect: process.env.DB_DIALECT,
-    },
-    production: {
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME_PRODUCTION,
-        host: process.env.DB_HOST,
-        dialect: process.env.DB_DIALECT,
-    },
-};
+const dialect: Dialect = 'postgres'; // Specify the dialect explicitly
+
+const databaseConfig = (configService: ConfigService) => ({
+  development: {
+    username: configService.get<string>('db.username'),
+    password: configService.get<string>('db.password'),
+    database:
+      process.env.NODE_ENV === 'production'
+        ? configService.get<string>('db.dbProduction')
+        : configService.get<string>('db.dbDevelopment'),
+    host: configService.get<string>('db.host'),
+    port: Number(configService.get<number>('db.port')),
+    dialect: 'postgres',
+    models: [User], // [__dirname + '/**/*.entity{.ts,.js}'],
+    autoloadModels: true,
+    logging: true, // Set to true if you want to see SQL logs during migrations
+  },
+});
+
+export { databaseConfig };
+module.exports.databaseConfig = databaseConfig;

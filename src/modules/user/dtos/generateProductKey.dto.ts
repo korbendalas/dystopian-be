@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum } from 'class-validator';
-import { UserType } from '@prisma/client';
+import { UserType } from '../types';
 
 export class GenerateProductKeyDto {
   @IsEmail()
