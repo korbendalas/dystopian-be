@@ -1,4 +1,5 @@
-import { PrismaClient, PropertyType } from '@prisma/client';
+import { PrismaClient, UserType } from '@prisma/client';
+
 import {
   rand,
   randAddress,
@@ -7,64 +8,171 @@ import {
   randFloat,
   randNumber,
   randPhoneNumber,
+  randProductDescription,
+  randProductName,
+  randTextRange,
   randUser,
 } from '@ngneat/falso';
+import { addDays, addMonths, addYears, format, toDate } from 'date-fns';
+import { categoriesData } from './mockData/categories.mockdata';
+import { brandsData } from './mockData/brands.mockData';
+import * as bcrypt from 'bcryptjs';
+import * as process from 'process';
 
 const prisma = new PrismaClient();
 
 async function seed() {
   // Generate mock data for users
+
   const users = [];
   for (let i = 0; i < 100; i++) {
     const user = {
-      name: randUser().firstName,
+      firstName: randUser().firstName,
+      lastName: randUser().lastName,
+      username: randUser().username,
       telephone: randPhoneNumber(),
       email: 'testuser' + i + '@example.com',
-      password: 'test@123',
-      user_type: rand(['BUYER', 'REALTOR', 'ADMIN']),
+      password: await bcrypt.hash(
+        'test@123',
+        Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
+      ),
+      user_type: rand([UserType.REGULAR, UserType.ADMIN]),
     };
 
     users.push(user);
   }
 
-  // Generate mock data for homes
-  const homes = [];
-  for (let i = 0; i < 20; i++) {
-    const home = {
-      address: randAddress().street,
-      number_of_bedrooms: randNumber({ min: 1, max: 5 }),
-      number_of_bathrooms: randNumber({ min: 1, max: 3 }),
-      city: randCity(),
-      listed_date: randBetweenDate({
-        from: new Date(2022, 0, 1),
-        to: new Date(),
-      }),
-      price: randFloat({ min: 100000, max: 1000000, precision: 2 }),
-      land_size: randFloat({ min: 500, max: 2000, precision: 2 }),
-      propertyType: rand([PropertyType.RESIDENTAL, PropertyType.CONDO]),
-      realtor_id: randNumber({ min: 1, max: users.length }),
+  //create seed function for categories using the following schema model in prisma.schema and categoriesData array
+  const categories = [];
+  for (let i = 0; i < categoriesData.length; i++) {
+    const category = {
+      name: categoriesData[i].name,
+      parentId: categoriesData[i].parentId,
     };
-    homes.push(home);
+    categories.push(category);
   }
 
-  // Generate mock data for images
-  const images = [];
-  for (let i = 0; i < 50; i++) {
-    const image = {
-      imgUrl: `https://example.com/image-${i}.jpg`,
-      home_id: randNumber({ min: 1, max: homes.length }),
+  const brands = [];
+  for (let i = 0; i < brandsData.length; i++) {
+    const brand = {
+      name: brandsData[i].name,
     };
-    images.push(image);
+    brands.push(brand);
   }
 
   try {
-    const createdUsers = await prisma.user.createMany({
+    const createdUsers = await prisma.users.createMany({
       data: users,
     });
+    console.log('createdUsers successfully:', createdUsers);
 
-    const createdHomes = await prisma.home.createMany({ data: homes });
-    const createdImages = await prisma.image.createMany({ data: images });
-    console.log('Mock data seeded successfully:');
+    if (createdUsers) {
+      const getUsers = await prisma.users.findMany();
+      console.log('getUsers successfully:', getUsers);
+      const userImages = getUsers.map((user) => {
+        return {
+          imgUrl: `https://example.com/image-${user.id}.jpg`,
+          user_id: user.id,
+        };
+      });
+
+      const createdUserImages = await prisma.userAvatars.createMany({
+        data: userImages,
+      });
+      console.log('createdUserImages successfully:');
+    }
+
+    const createdCategories = await prisma.category.createMany({
+      data: categories,
+    });
+    console.log('createdCategories successfully:', createdCategories);
+
+    const createdBrands = await prisma.brands.createMany({ data: brands });
+    console.log('createdBrands successfully:', createdBrands);
+
+    const products = [];
+    if (createdCategories && createdBrands) {
+      const getCategories = await prisma.category.findMany();
+      const getBrands = await prisma.brands.findMany();
+
+      for (let i = 0; i < 250; i++) {
+        const product = {
+          title: randProductName(),
+          price: randNumber({ min: 100, max: 1000 }),
+          discountPrice: rand([null, randNumber({ min: 100, max: 1000 })]),
+          quantity: randNumber({ min: 1, max: 200 }),
+          sold: randNumber({ min: 1, max: 100 }),
+          brand_id: rand([...getBrands.map((b) => b.id)]),
+          smallDescription: randTextRange({ min: 50, max: 100 }),
+          largeDescription: randTextRange({ min: 200, max: 1000 }),
+          specification: randProductDescription(),
+          categoryId: rand([...getCategories.map((c) => c.id)]),
+        };
+        products.push(product);
+      }
+      const createdProducts = await prisma.products.createMany({
+        data: products,
+      });
+      console.log('createdProducts successfully:', createdProducts);
+
+      const getUsers = await prisma.users.findMany();
+
+      const featuredProducts = [];
+      const specialOffers = [];
+      const productImages = [];
+
+      if (createdProducts) {
+        const getProducts = await prisma.products.findMany();
+        for (let i = 0; i < 20; i++) {
+          const featuredProduct = {
+            product_id: rand([...getProducts.map((p) => p.id)]),
+          };
+          featuredProducts.push(featuredProduct);
+        }
+
+        for (let i = 0; i < products.length; i++) {
+          for (let j = 0; j < 4; j++) {
+            const productImage = {
+              imgUrl: `https://example.com/image-${i}.jpg`,
+              product_id: rand([...getProducts.map((p) => p.id)]),
+              user_id: rand([...getUsers.map((u) => u.id)]),
+            };
+            productImages.push(productImage);
+          }
+        }
+
+        for (let i = 0; i < 20; i++) {
+          const specialOffer = {
+            product_id: rand([...getProducts.map((p) => p.id)]),
+            starts_at: toDate(new Date()),
+            // end date is between 3 and 6 days from now
+            ends_at: addDays(new Date(), randNumber({ min: 3, max: 6 })),
+          };
+          specialOffers.push(specialOffer);
+        }
+      }
+
+      const createdFeaturedProducts = await prisma.featuredProducts.createMany({
+        data: featuredProducts,
+      });
+
+      console.log(
+        'createdFeaturedProducts successfully:',
+        createdFeaturedProducts,
+      );
+
+      const createdProductImages = await prisma.productImages.createMany({
+        data: productImages,
+      });
+      console.log('createdProductImages successfully:', createdProductImages);
+
+      const createdSpecialOffers = await prisma.specialOffers.createMany({
+        data: specialOffers,
+      });
+      console.log('createdSpecialOffers successfully:', createdSpecialOffers);
+    }
+
+    console.log('Seeding completed successfully!');
   } catch (error) {
     console.error('Error seeding mock data:', error);
   } finally {

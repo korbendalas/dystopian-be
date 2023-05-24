@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
           process.env.JWT_SECRET,
         )) as JWTPayload;
 
-        const user = await this.prismaService.user.findUnique({
+        const user = await this.prismaService.users.findUnique({
           where: { id: decode.id },
         });
         if (!user) return false;

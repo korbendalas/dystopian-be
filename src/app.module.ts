@@ -3,13 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
-import { HomeModule } from './modules/home/home.module';
+// import { HomeModule } from './modules/home/home.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { UserInterceptor } from './modules/user/interceptors/user.interceptor';
 import { AuthGuard } from './modules/guards/auth.guard';
+import { RemovePasswordInterceptor } from './modules/user/interceptors/removePassword.interceptor';
+import { ProductsModule } from './modules/products/products.module';
 
 @Module({
-  imports: [UserModule, PrismaModule, HomeModule],
+  imports: [PrismaModule, UserModule, ProductsModule],
   controllers: [AppController],
   providers: [
     AppService,
@@ -17,6 +19,7 @@ import { AuthGuard } from './modules/guards/auth.guard';
       provide: APP_INTERCEPTOR,
       useClass: UserInterceptor,
     },
+    { provide: APP_INTERCEPTOR, useClass: RemovePasswordInterceptor },
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })

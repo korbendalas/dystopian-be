@@ -1,33 +1,26 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class SignupDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  firstName: string;
 
   // @IsString()
   // @Matches(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/)
-
+  @IsString()
   @IsNotEmpty()
-  telephone: string;
+  lastName: string;
 
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
   @IsNotEmpty()
-  @IsString()
   @MinLength(5)
   password: string;
 
   @IsString()
-  @IsOptional()
   @IsNotEmpty()
-  productKey?: string;
+  username: string;
 }
