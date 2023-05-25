@@ -37,6 +37,7 @@ model Category {
 
 model Products {
   id               Int                @id @default(autoincrement())
+  uuid             String             @unique @default(uuid())
   title            String
   price            Int
   discountPrice    Int?

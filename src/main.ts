@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
-import * as process from 'process';
+import { dump } from 'yamljs';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,6 +26,8 @@ async function bootstrap() {
     .addTag('Realtor V1')
     .build();
   const document = SwaggerModule.createDocument(app, config);
+  fs.writeFileSync('openapi.json', JSON.stringify(document, null, 2));
+
   SwaggerModule.setup('swagger', app, document);
 
   await app.listen(port);
