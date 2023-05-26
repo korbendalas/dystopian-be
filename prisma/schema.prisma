@@ -17,7 +17,14 @@ model Users {
   username      String          @unique
   telephone     String?
   email         String          @unique
-  password      String
+  password      String?
+  address       String?
+  city          String?
+  country       String?
+  zipCode       String?
+  googleId      String?         @unique
+  facebookId    String?         @unique
+  githubId      String?         @unique
   Favorites     Favorites[]
   user_type     UserType        @default(REGULAR)
   created_at    DateTime        @default(now())
