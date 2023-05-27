@@ -110,9 +110,10 @@ export class AuthService {
     return { token, user };
   }
 
+  // TODO implement Refresh token functionality
   async generateToken({ username, id }) {
     return jwt.sign({ username, id }, process.env.JWT_SECRET, {
-      expiresIn: '5 days',
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
   }
   async checkUsername(username: string): Promise<boolean> {
