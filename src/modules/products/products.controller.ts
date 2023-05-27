@@ -11,13 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Products } from '@prisma/client';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiProperty,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 export type ProductsPaginated = {
   productsList: Products[];
@@ -36,23 +30,23 @@ export class ProductsController {
     @Query('limit', new ParseIntPipe()) limit = 20,
     @Query('offset', new ParseIntPipe()) offset = 1,
   ): Promise<ProductsPaginated> {
-    return await this.productService.getProducts(limit, offset);
+    return this.productService.getProducts(limit, offset);
   }
   @Get('featured')
   async getFeaturedProducts(
     @Query('limit', new ParseIntPipe()) limit = 20,
     @Query('offset', new ParseIntPipe()) offset = 1,
   ) {
-    return await this.productService.getFeaturedProducts(limit, offset);
+    return this.productService.getFeaturedProducts(limit, offset);
   }
 
   @Get(':id')
   async getProductById(@Param('id', new ParseIntPipe()) id: number) {
-    return await this.productService.getProductById(id);
+    return this.productService.getProductById(id);
   }
   @Get(':uuid')
   async getProductByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return await this.productService.getProductByUuid(uuid);
+    return this.productService.getProductByUuid(uuid);
   }
   @Post()
   createProduct() {
@@ -63,6 +57,8 @@ export class ProductsController {
   updateProduct() {
     return 'This action updates a product';
   }
+
+  //TODO Add AuthGuard that only ADMINS can delete products
   @Delete(':id')
   deleteProduct(@Param('id', new ParseIntPipe()) id: number) {
     return this.productService.deleteProduct(id);
