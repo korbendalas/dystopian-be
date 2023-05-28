@@ -1,15 +1,14 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class SignupDto {
+export class UserResponseDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   firstName: string;
 
   @ApiProperty()
-  // @IsString()
-  // @Matches(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/)
   @IsString()
   @IsNotEmpty()
   lastName: string;
@@ -22,11 +21,8 @@ export class SignupDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @MinLength(5)
-  password: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   username: string;
+
+  @Exclude() // Exclude the password field from serialization
+  password: string;
 }
