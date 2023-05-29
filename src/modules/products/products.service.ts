@@ -6,7 +6,7 @@ export class ProductsService {
   constructor(private prismaService: PrismaService) {}
 
   async getProducts(limit: number, offset: number) {
-    return await this.prismaService.$transaction(async (prisma) => {
+    return this.prismaService.$transaction(async (prisma) => {
       const productsList = await prisma.products.findMany({
         skip: (offset - 1) * limit, // Calculate the number of items to skip based on the page and page size
         take: limit, // Define the maximum number of items to fetch per page
@@ -19,7 +19,7 @@ export class ProductsService {
   }
 
   async getFeaturedProducts(limit: number, offset: number) {
-    return await this.prismaService.$transaction(async (prisma) => {
+    return this.prismaService.$transaction(async (prisma) => {
       const productsList = await prisma.featuredProducts.findMany({
         skip: (offset - 1) * limit, // Calculate the number of items to skip based on the page and page size
         take: limit, //
@@ -39,12 +39,12 @@ export class ProductsService {
   }
 
   async getProductByUuid(uuid: string) {
-    return await this.prismaService.products.findUnique({
+    return this.prismaService.products.findUnique({
       where: { uuid: uuid },
     });
   }
   async getProductById(id: number) {
-    return await this.prismaService.products.findUnique({
+    return this.prismaService.products.findUnique({
       where: { id },
     });
   }
@@ -54,8 +54,9 @@ export class ProductsService {
   async updateProduct() {
     return 'This action updates a product';
   }
+
   async deleteProduct(id: number) {
-    return await this.prismaService.products.delete({
+    return this.prismaService.products.delete({
       where: { id },
     });
   }

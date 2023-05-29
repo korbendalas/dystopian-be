@@ -9,9 +9,10 @@ import { UserInterceptor } from './modules/user/interceptors/user.interceptor';
 import { AuthGuard } from './modules/guards/auth.guard';
 import { RemovePasswordInterceptor } from './modules/user/interceptors/removePassword.interceptor';
 import { ProductsModule } from './modules/products/products.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, ProductsModule],
+  imports: [PrismaModule, AuthModule, UserModule, ProductsModule],
   controllers: [AppController],
   providers: [
     AppService,

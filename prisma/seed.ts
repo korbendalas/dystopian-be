@@ -43,22 +43,22 @@ async function seed() {
   }
 
   //create seed function for categories using the following schema model in prisma.schema and categoriesData array
-  const categories = [];
-  for (let i = 0; i < categoriesData.length; i++) {
-    const category = {
-      name: categoriesData[i].name,
-      parentId: categoriesData[i].parentId,
+  //refactor it to use the categoriesData array with map function
+  const categories = categoriesData.map((category) => {
+    return {
+      name: category.name,
+      parentId: category.parentId,
     };
-    categories.push(category);
-  }
+  });
 
-  const brands = [];
-  for (let i = 0; i < brandsData.length; i++) {
-    const brand = {
-      name: brandsData[i].name,
+  //create seed function for brands using the following schema model in prisma.schema and brandsData array using map function
+  //refactor it to use the brandsData array with map function
+
+  const brands = brandsData.map((brand) => {
+    return {
+      name: brand.name,
     };
-    brands.push(brand);
-  }
+  });
 
   try {
     const createdUsers = await prisma.users.createMany({
