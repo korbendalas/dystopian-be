@@ -26,7 +26,6 @@ export class AuthController {
     return this.authService.signin(body);
   }
 
-  // @UseGuards(GoogleOauthGuard)
   @UseGuards(GoogleOauthGuard)
   @Get('google')
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -35,7 +34,13 @@ export class AuthController {
   @UseGuards(GoogleOauthGuard)
   @Get('google/callback')
   async googleAuthCallback(@Req() req, @Res() res) {
+    if (!req.user) {
+      return res.redirect('http://localhost:3000');
+    }
+
     const user = await this.authService.oauth(req.user);
-    return res.send(user);
+    return res.redirect(
+      `http://localhost:3000/oauth-redirect?token=${user.token}`,
+    );
   }
 }

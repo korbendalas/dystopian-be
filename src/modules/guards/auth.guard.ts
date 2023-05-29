@@ -29,7 +29,10 @@ export class AuthGuard implements CanActivate {
 
     if (roles?.length) {
       const req = context.switchToHttp().getRequest();
+
       const token = req?.headers?.authorization.split('Bearer ')[1];
+
+      console.log('REQ', req?.user);
 
       try {
         const decode = (await jwt.verify(
