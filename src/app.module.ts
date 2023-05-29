@@ -10,7 +10,6 @@ import { AuthGuard } from './modules/guards/auth.guard';
 import { RemovePasswordInterceptor } from './modules/user/interceptors/removePassword.interceptor';
 import { ProductsModule } from './modules/products/products.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [PrismaModule, AuthModule, UserModule, ProductsModule],

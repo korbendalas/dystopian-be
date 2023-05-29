@@ -65,6 +65,17 @@
         }
       }
     },
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "UserController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/products": {
       "get": {
         "operationId": "ProductsController_getProducts",
