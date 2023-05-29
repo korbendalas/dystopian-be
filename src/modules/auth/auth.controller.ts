@@ -35,7 +35,7 @@ export class AuthController {
   @Get('google/callback')
   async googleAuthCallback(@Req() req, @Res() res) {
     if (!req.user) {
-      return res.redirect('http://localhost:3000');
+      return res.redirect(req.headers.origin);
     }
 
     const user = await this.authService.oauth(req.user);
