@@ -39,8 +39,9 @@ export class AuthController {
     }
 
     const user = await this.authService.oauth(req.user);
+    console.log('req.headers.origin', req.headers.origin); // test
     return res.redirect(
-      `http://localhost:3000/oauth-redirect?token=${user.token}`,
+      `${req.headers.origin}/oauth-redirect?token=${user.token}`,
     );
   }
 }
