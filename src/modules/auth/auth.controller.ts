@@ -34,10 +34,8 @@ export class AuthController {
   @UseGuards(GoogleOauthGuard)
   @Get('google/callback')
   async googleAuthCallback(@Req() req, @Res() res) {
-    const REDIRECT_FE_URL =
-      process.env.NODE_ENV === 'production'
-        ? process.env.PRODUCTION_FRONTEND_URL
-        : process.env.DEVELOP_FRONTEND_URL;
+    console.log('process.env.NODE_ENV ', process.env.NODE_ENV);
+    const REDIRECT_FE_URL = process.env.FRONTEND_URL;
 
     if (!req.user) {
       return res.redirect(REDIRECT_FE_URL);
