@@ -20,17 +20,37 @@ export class ProductsService {
 
   async getFeaturedProducts(limit: number, offset: number) {
     return this.prismaService.$transaction(async (prisma) => {
-      const productsList = await prisma.featuredProducts.findMany({
+      const products = await prisma.featuredProducts.findMany({
         skip: (offset - 1) * limit, // Calculate the number of items to skip based on the page and page size
         take: limit, //
-        include: {
+        select: {
           Products: {
             include: {
               Brand: true,
+              Category: true,
+              ProductImages: true,
             },
           },
-        }, // Define the maximum number of items to fetch per page
+        },
       });
+
+      // // Modify the result to use lowercase property names
+      const productsList = products.map((featuredProduct) => ({
+        id: featuredProduct.Products.id,
+        uuid: featuredProduct.Products.uuid,
+        title: featuredProduct.Products.title,
+        price: featuredProduct.Products.price,
+        discountPrice: featuredProduct.Products.discountPrice,
+        quantity: featuredProduct.Products.quantity,
+        sold: featuredProduct.Products.sold,
+        smallDescription: featuredProduct.Products.smallDescription,
+        largeDescription: featuredProduct.Products.largeDescription,
+        specification: featuredProduct.Products.specification,
+        categoryId: featuredProduct.Products.categoryId,
+        brand: featuredProduct.Products.Brand,
+        category: featuredProduct.Products.Category,
+        images: featuredProduct.Products.ProductImages,
+      }));
 
       const totalCount = await prisma.products.count();
 

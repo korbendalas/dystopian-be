@@ -133,7 +133,7 @@ async function seed() {
         for (let i = 0; i < products.length; i++) {
           for (let j = 0; j < 4; j++) {
             const productImage = {
-              imgUrl: `https://example.com/image-${i}.jpg`,
+              imgUrl: `https://picsum.photos/id/${i}/200/300`,
               product_id: rand([...getProducts.map((p) => p.id)]),
               user_id: rand([...getUsers.map((u) => u.id)]),
             };
