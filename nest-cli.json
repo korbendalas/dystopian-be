@@ -1,5 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src"
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "assets": [
+      {
+        "include": "modules/mailer/templates/**/*.hbs",
+        "outDir": "dist/src",
+        "watchAssets": true
+      },
+      {
+        "include": "../keys/*.key",
+        "outDir": "dist/keys",
+        "watchAssets": true
+      }
+    ]
+  },
+  "watchAssets": true
 }

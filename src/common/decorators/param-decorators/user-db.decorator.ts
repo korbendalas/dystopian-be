@@ -11,7 +11,7 @@ export interface UserDecoratorInterface {
   iat: number;
   exp: number;
 }
-export const User = createParamDecorator(
+export const UserDB = createParamDecorator(
   async (data, context: ExecutionContext) => {
     //context is Same thing as in interceptor
 
@@ -21,7 +21,7 @@ export const User = createParamDecorator(
       throw new NotFoundException('User not found.');
     }
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },

@@ -61,13 +61,13 @@ async function seed() {
   });
 
   try {
-    const createdUsers = await prisma.users.createMany({
+    const createdUsers = await prisma.user.createMany({
       data: users,
     });
     console.log('createdUsers successfully:', createdUsers);
 
     if (createdUsers) {
-      const getUsers = await prisma.users.findMany();
+      const getUsers = await prisma.user.findMany();
       console.log('getUsers successfully:', getUsers);
       const userImages = getUsers.map((user) => {
         return {
@@ -76,7 +76,7 @@ async function seed() {
         };
       });
 
-      const createdUserImages = await prisma.userAvatars.createMany({
+      const createdUserImages = await prisma.userAvatar.createMany({
         data: userImages,
       });
       console.log('createdUserImages successfully:');
@@ -87,13 +87,13 @@ async function seed() {
     });
     console.log('createdCategories successfully:', createdCategories);
 
-    const createdBrands = await prisma.brands.createMany({ data: brands });
+    const createdBrands = await prisma.brand.createMany({ data: brands });
     console.log('createdBrands successfully:', createdBrands);
 
     const products = [];
     if (createdCategories && createdBrands) {
       const getCategories = await prisma.category.findMany();
-      const getBrands = await prisma.brands.findMany();
+      const getBrands = await prisma.brand.findMany();
 
       for (let i = 0; i < 250; i++) {
         const product = {
@@ -110,19 +110,19 @@ async function seed() {
         };
         products.push(product);
       }
-      const createdProducts = await prisma.products.createMany({
+      const createdProducts = await prisma.product.createMany({
         data: products,
       });
       console.log('createdProducts successfully:', createdProducts);
 
-      const getUsers = await prisma.users.findMany();
+      const getUsers = await prisma.user.findMany();
 
       const featuredProducts = [];
       const specialOffers = [];
       const productImages = [];
 
       if (createdProducts) {
-        const getProducts = await prisma.products.findMany();
+        const getProducts = await prisma.product.findMany();
         for (let i = 0; i < 20; i++) {
           const featuredProduct = {
             product_id: rand([...getProducts.map((p) => p.id)]),
@@ -152,7 +152,7 @@ async function seed() {
         }
       }
 
-      const createdFeaturedProducts = await prisma.featuredProducts.createMany({
+      const createdFeaturedProducts = await prisma.featuredProduct.createMany({
         data: featuredProducts,
       });
 
@@ -166,7 +166,7 @@ async function seed() {
       });
       console.log('createdProductImages successfully:', createdProductImages);
 
-      const createdSpecialOffers = await prisma.specialOffers.createMany({
+      const createdSpecialOffers = await prisma.specialOffer.createMany({
         data: specialOffers,
       });
       console.log('createdSpecialOffers successfully:', createdSpecialOffers);

@@ -2,7 +2,8 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as jwt from 'jsonwebtoken';
 import * as process from 'process';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../modules/prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 interface JWTPayload {
   id: number;
@@ -15,6 +16,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     //1 Determine the UserType
@@ -40,7 +42,7 @@ export class AuthGuard implements CanActivate {
           process.env.JWT_SECRET,
         )) as JWTPayload;
 
-        const user = await this.prismaService.users.findUnique({
+        const user = await this.prismaService.user.findUnique({
           where: { id: decode.id },
         });
         if (!user) return false;

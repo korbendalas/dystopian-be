@@ -10,11 +10,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Products } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 export type ProductsPaginated = {
-  productsList: Products[];
+  productsList: Product[];
   totalCount: number;
 };
 @ApiTags('Products')

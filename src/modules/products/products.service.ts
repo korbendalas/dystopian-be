@@ -7,12 +7,12 @@ export class ProductsService {
 
   async getProducts(limit: number, offset: number) {
     return this.prismaService.$transaction(async (prisma) => {
-      const productsList = await prisma.products.findMany({
+      const productsList = await prisma.product.findMany({
         skip: (offset - 1) * limit, // Calculate the number of items to skip based on the page and page size
         take: limit, // Define the maximum number of items to fetch per page
       });
 
-      const totalCount = await prisma.products.count();
+      const totalCount = await prisma.product.count();
 
       return { productsList, totalCount };
     });
@@ -20,11 +20,11 @@ export class ProductsService {
 
   async getFeaturedProducts(limit: number, offset: number) {
     return this.prismaService.$transaction(async (prisma) => {
-      const products = await prisma.featuredProducts.findMany({
+      const products = await prisma.featuredProduct.findMany({
         skip: (offset - 1) * limit, // Calculate the number of items to skip based on the page and page size
         take: limit, //
         select: {
-          Products: {
+          Product: {
             include: {
               Brand: true,
               Category: true,
@@ -36,35 +36,35 @@ export class ProductsService {
 
       // // Modify the result to use lowercase property names
       const productsList = products.map((featuredProduct) => ({
-        id: featuredProduct.Products.id,
-        uuid: featuredProduct.Products.uuid,
-        title: featuredProduct.Products.title,
-        price: featuredProduct.Products.price,
-        discountPrice: featuredProduct.Products.discountPrice,
-        quantity: featuredProduct.Products.quantity,
-        sold: featuredProduct.Products.sold,
-        smallDescription: featuredProduct.Products.smallDescription,
-        largeDescription: featuredProduct.Products.largeDescription,
-        specification: featuredProduct.Products.specification,
-        categoryId: featuredProduct.Products.categoryId,
-        brand: featuredProduct.Products.Brand,
-        category: featuredProduct.Products.Category,
-        images: featuredProduct.Products.ProductImages,
+        id: featuredProduct.Product.id,
+        uuid: featuredProduct.Product.uuid,
+        title: featuredProduct.Product.title,
+        price: featuredProduct.Product.price,
+        discountPrice: featuredProduct.Product.discountPrice,
+        quantity: featuredProduct.Product.quantity,
+        sold: featuredProduct.Product.sold,
+        smallDescription: featuredProduct.Product.smallDescription,
+        largeDescription: featuredProduct.Product.largeDescription,
+        specification: featuredProduct.Product.specification,
+        categoryId: featuredProduct.Product.categoryId,
+        brand: featuredProduct.Product.Brand,
+        category: featuredProduct.Product.Category,
+        images: featuredProduct.Product.ProductImages,
       }));
 
-      const totalCount = await prisma.products.count();
+      const totalCount = await prisma.product.count();
 
       return { productsList, totalCount };
     });
   }
 
   async getProductByUuid(uuid: string) {
-    return this.prismaService.products.findUnique({
+    return this.prismaService.product.findUnique({
       where: { uuid: uuid },
     });
   }
   async getProductById(id: number) {
-    return this.prismaService.products.findUnique({
+    return this.prismaService.product.findUnique({
       where: { id },
     });
   }
@@ -76,7 +76,7 @@ export class ProductsService {
   }
 
   async deleteProduct(id: number) {
-    return this.prismaService.products.delete({
+    return this.prismaService.product.delete({
       where: { id },
     });
   }

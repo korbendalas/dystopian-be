@@ -10,27 +10,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id            Int             @id @default(autoincrement())
-  firstName     String
-  lastName      String
-  username      String          @unique
-  telephone     String?
-  email         String          @unique
-  password      String?
-  address       String?
-  city          String?
-  country       String?
-  zipCode       String?
-  googleId      String?         @unique
-  facebookId    String?         @unique
-  githubId      String?         @unique
-  Favorites     Favorites[]
-  user_type     UserType        @default(REGULAR)
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
-  UserAvatar    UserAvatars[]
-  ProductImages ProductImages[]
+model User {
+  id                 Int                 @id @default(autoincrement())
+  firstName          String
+  lastName           String
+  username           String              @unique
+  telephone          String?
+  email              String              @unique
+  password           String?
+  hashedRefreshToken String?
+  address            String?
+  city               String?
+  country            String?
+  zipCode            String?
+  googleId           String?             @unique
+  facebookId         String?             @unique
+  githubId           String?             @unique
+  Favorites          Favorites[]
+  user_type          UserType            @default(REGULAR)
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+  UserAvatar         UserAvatar[]
+  ProductImages      ProductImages[]
+  BlacklistedTokens  BlacklistedTokens[]
+
+  @@map("users")
+}
+
+// create blacklistedtokens table, with composite key of token_id and user_id
+
+model BlacklistedTokens {
+  token_id   String   @default(uuid())
+  user_id    Int
+  User       User     @relation(fields: [user_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([user_id, token_id])
+  @@map("blacklisted_tokens")
 }
 
 model Category {
@@ -39,54 +56,64 @@ model Category {
   parentId      Int?
   parent        Category?  @relation("Subcategories", fields: [parentId], references: [id])
   subcategories Category[] @relation("Subcategories")
-  products      Products[] @relation("CategoryProducts")
+  products      Product[]  @relation("CategoryProducts")
+
+  @@map("categories")
 }
 
-model Products {
-  id               Int                @id @default(autoincrement())
-  uuid             String             @unique @default(uuid())
+model Product {
+  id               Int               @id @default(autoincrement())
+  uuid             String            @unique @default(uuid())
   title            String
   price            Int
   discountPrice    Int?
-  quantity         Int                @default(0)
-  sold             Int                @default(0)
+  quantity         Int               @default(0)
+  sold             Int               @default(0)
   brand_id         Int
-  Brand            Brands             @relation(fields: [brand_id], references: [id])
+  Brand            Brand             @relation(fields: [brand_id], references: [id])
   smallDescription String
   largeDescription String
   specification    String
   categoryId       Int
-  Category         Category           @relation("CategoryProducts", fields: [categoryId], references: [id])
+  Category         Category          @relation("CategoryProducts", fields: [categoryId], references: [id])
   Favorites        Favorites[]
   ProductImages    ProductImages[]
-  FeaturedProducts FeaturedProducts[]
-  SpecialOffers    SpecialOffers[]
+  FeaturedProducts FeaturedProduct[]
+  SpecialOffers    SpecialOffer[]
+
+  @@map("products")
 }
 
-model Brands {
-  id         Int        @id @default(autoincrement())
+model Brand {
+  id         Int       @id @default(autoincrement())
   name       String
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  Products   Products[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  Product    Product[]
+
+  @@map("brands")
 }
 
-model FeaturedProducts {
+model FeaturedProduct {
   id         Int      @id @default(autoincrement())
   product_id Int
-  Products   Products @relation(fields: [product_id], references: [id])
+  Product    Product  @relation(fields: [product_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  @@map("featured_products")
 }
 
-model SpecialOffers {
+model SpecialOffer {
   id         Int      @id @default(autoincrement())
   product_id Int
-  Products   Products @relation(fields: [product_id], references: [id])
+  Product    Product  @relation(fields: [product_id], references: [id])
   starts_at  DateTime
   ends_at    DateTime
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  @@map("special_offers")
 }
 
 model Favorites {
@@ -95,28 +122,34 @@ model Favorites {
   product_id Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       Users?   @relation(fields: [user_id], references: [id])
-  Product    Products @relation(fields: [product_id], references: [id])
+  User       User?    @relation(fields: [user_id], references: [id])
+  Product    Product  @relation(fields: [product_id], references: [id])
+
+  @@map("favorites")
 }
 
-model UserAvatars {
+model UserAvatar {
   id         Int      @id @default(autoincrement())
   imgUrl     String
   user_id    Int // uploaded by
-  User       Users    @relation(fields: [user_id], references: [id])
+  User       User     @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  @@map("user_avatars")
 }
 
 model ProductImages {
   id         Int      @id @default(autoincrement())
   imgUrl     String
   product_id Int
-  Product    Products @relation(fields: [product_id], references: [id])
+  Product    Product  @relation(fields: [product_id], references: [id])
   user_id    Int? // uploaded by
-  User       Users?   @relation(fields: [user_id], references: [id])
+  User       User?    @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  @@map("product_images")
 }
 
 enum UserType {

@@ -1,13 +1,21 @@
 import { IEmailConfig } from './email-config.interface';
 import { IJwt } from './jwt.interface';
-import { PrismaClientOptions } from '@prisma/client/runtime';
+
+export interface IDomain {
+  frontend: string;
+  backend: string;
+}
+export interface IBcrypt {
+  salt: number;
+}
 
 export interface IConfig {
   id: string;
   port: number;
-  domain: string;
+  domain: IDomain;
   // import prisma module options type connection string
-  db: PrismaClientOptions;
+  db: string;
   jwt: IJwt;
+  bcypt: IBcrypt;
   emailService: IEmailConfig;
 }
