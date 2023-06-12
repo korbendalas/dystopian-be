@@ -46,9 +46,7 @@ export class AuthGuard implements CanActivate {
           where: { id: decode.id },
         });
         if (!user) return false;
-        if (roles.includes(user.user_type)) return true;
-
-        return false;
+        return !!roles.includes(user.userType);
       } catch (err) {
         return false;
       }

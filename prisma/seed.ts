@@ -36,7 +36,15 @@ async function seed() {
         'test@123',
         Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
       ),
-      user_type: rand([UserType.REGULAR, UserType.ADMIN]),
+      userType: rand([
+        UserType.USER,
+        UserType.ADMIN,
+        UserType.MODERATOR,
+        UserType.MANAGER,
+        UserType.SUPPORT,
+        UserType.RESTRICTED,
+        UserType.AFFILIATE,
+      ]),
     };
 
     users.push(user);

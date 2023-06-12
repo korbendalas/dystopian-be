@@ -146,7 +146,26 @@
     "/api/v1/products/featured": {
       "get": {
         "operationId": "ProductsController_getFeaturedProducts",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 20,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""

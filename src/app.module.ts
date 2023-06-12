@@ -15,6 +15,8 @@ import { config } from './config';
 import { CommonModule } from './modules/common/common.module';
 import { MailerModule } from './modules/mailer/mailer.module';
 import { AtGuard } from './common/guards/at.guard';
+import { AccessControlModule, ACGuard } from 'nest-access-control';
+import { RBAC_POLICY } from './modules/auth/rbac-policy';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { AtGuard } from './common/guards/at.guard';
       isGlobal: true,
       load: [config],
     }),
+    AccessControlModule.forRoles(RBAC_POLICY),
     CommonModule,
     PrismaModule,
     AuthModule,
@@ -38,7 +41,7 @@ import { AtGuard } from './common/guards/at.guard';
     // },
     { provide: APP_INTERCEPTOR, useClass: RemovePasswordInterceptor },
     { provide: APP_GUARD, useClass: AtGuard },
-    // { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: ACGuard },
   ],
 })
 export class AppModule {}

@@ -77,7 +77,7 @@ export class AuthController {
 
     const user = await this.authService.oauth(req.user);
     return res.redirect(
-      `${REDIRECT_FE_URL}/oauth-redirect?token=${user.token}`,
+      `${REDIRECT_FE_URL}/oauth-redirect?token=${user.token}&refreshToken=${user.refreshToken}`,
     );
   }
 }

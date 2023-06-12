@@ -175,7 +175,10 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         { username, id },
-        { expiresIn: this.jwtExpirationTime, secret: this.jwtRefreshSecret },
+        {
+          expiresIn: this.jwtRefreshExpirationTime,
+          secret: this.jwtRefreshSecret,
+        },
       ),
     ]);
     return { accessToken: token, refreshToken };

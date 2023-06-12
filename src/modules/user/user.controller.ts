@@ -4,13 +4,14 @@ import {
   UserDecoratorInterface,
 } from '../../common/decorators/param-decorators/user-db.decorator';
 import { UserService } from '../user/user.service';
+import { UserJwt } from '../../common/decorators/param-decorators/user-jwt.decorator';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/me')
-  async me(@UserDB() user: UserDecoratorInterface) {
+  async me(@UserJwt() user: UserDecoratorInterface) {
     return this.userService.me(user.id);
   }
 }

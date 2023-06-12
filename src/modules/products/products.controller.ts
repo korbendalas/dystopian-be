@@ -11,7 +11,11 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from '@prisma/client';
+import { Public } from '../../common/decorators/public.decorator';
+
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UseRoles } from 'nest-access-control';
+import { RbacPolicy } from '../auth/rbac-policy';
 
 export type ProductsPaginated = {
   productsList: Product[];
@@ -25,6 +29,7 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: true, type: Number, example: 20 })
   @ApiQuery({ name: 'offset', required: true, type: Number, example: 1 })
   // @ApiCreatedResponse({ type: ProductsPaginated })
+  @Public()
   @Get()
   async getProducts(
     @Query('limit', new ParseIntPipe()) limit = 20,
@@ -32,7 +37,11 @@ export class ProductsController {
   ): Promise<ProductsPaginated> {
     return this.productService.getProducts(limit, offset);
   }
+
+  @ApiQuery({ name: 'limit', required: true, type: Number, example: 20 })
+  @ApiQuery({ name: 'offset', required: true, type: Number, example: 1 })
   @Get('featured')
+  @Public()
   async getFeaturedProducts(
     @Query('limit', new ParseIntPipe()) limit = 20,
     @Query('offset', new ParseIntPipe()) offset = 1,
@@ -40,10 +49,13 @@ export class ProductsController {
     return this.productService.getFeaturedProducts(limit, offset);
   }
 
+  @Public()
   @Get(':id')
   async getProductById(@Param('id', new ParseIntPipe()) id: number) {
     return this.productService.getProductById(id);
   }
+
+  @Public()
   @Get(':uuid')
   async getProductByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productService.getProductByUuid(uuid);
@@ -59,8 +71,14 @@ export class ProductsController {
   }
 
   //TODO Add AuthGuard that only ADMINS can delete products
+  @UseRoles({
+    resource: RbacPolicy.PRODUCTS,
+    action: 'delete',
+    possession: 'any',
+  })
   @Delete(':id')
   deleteProduct(@Param('id', new ParseIntPipe()) id: number) {
+    console.log('id', id);
     return this.productService.deleteProduct(id);
   }
 }
