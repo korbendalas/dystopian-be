@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from '@prisma/client';
@@ -16,12 +17,14 @@ import { Public } from '../../common/decorators/public.decorator';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UseRoles } from 'nest-access-control';
 import { RbacPolicy } from '../auth/rbac-policy';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 export type ProductsPaginated = {
   productsList: Product[];
   totalCount: number;
 };
 @ApiTags('Products')
+@UseInterceptors(CacheInterceptor)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productService: ProductsService) {}
@@ -29,7 +32,9 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: true, type: Number, example: 20 })
   @ApiQuery({ name: 'offset', required: true, type: Number, example: 1 })
   // @ApiCreatedResponse({ type: ProductsPaginated })
+  @CacheTTL(10)
   @Public()
+  @CacheKey('all-products')
   @Get()
   async getProducts(
     @Query('limit', new ParseIntPipe()) limit = 20,
@@ -70,7 +75,6 @@ export class ProductsController {
     return 'This action updates a product';
   }
 
-  //TODO Add AuthGuard that only ADMINS can delete products
   @UseRoles({
     resource: RbacPolicy.PRODUCTS,
     action: 'delete',
@@ -78,7 +82,6 @@ export class ProductsController {
   })
   @Delete(':id')
   deleteProduct(@Param('id', new ParseIntPipe()) id: number) {
-    console.log('id', id);
     return this.productService.deleteProduct(id);
   }
 }
