@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Injectable()
+@Public()
 export class CartService {
   constructor(private readonly prismaService: PrismaService) {}
 
