@@ -176,16 +176,16 @@
         ]
       }
     },
-    "/api/v1/products/{id}": {
+    "/api/v1/products/{uuid}": {
       "get": {
-        "operationId": "ProductsController_getProductById",
+        "operationId": "ProductsController_getProductByUUID",
         "parameters": [
           {
-            "name": "id",
+            "name": "uuid",
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
@@ -197,7 +197,9 @@
         "tags": [
           "Products"
         ]
-      },
+      }
+    },
+    "/api/v1/products/{id}": {
       "patch": {
         "operationId": "ProductsController_updateProduct",
         "parameters": [],
@@ -219,29 +221,6 @@
             "in": "path",
             "schema": {
               "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Products"
-        ]
-      }
-    },
-    "/api/v1/products/{uuid}": {
-      "get": {
-        "operationId": "ProductsController_getProductByUUID",
-        "parameters": [
-          {
-            "name": "uuid",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],

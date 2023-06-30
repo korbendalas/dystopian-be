@@ -54,11 +54,11 @@ export class ProductsController {
     return this.productService.getFeaturedProducts(limit, offset);
   }
 
-  @Public()
-  @Get(':id')
-  async getProductById(@Param('id', new ParseIntPipe()) id: number) {
-    return this.productService.getProductById(id);
-  }
+  // @Public()
+  // @Get(':id')
+  // async getProductById(@Param('id', new ParseIntPipe()) id: number) {
+  //   return this.productService.getProductById(id);
+  // }
 
   @Public()
   @Get(':uuid')

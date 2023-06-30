@@ -59,14 +59,58 @@ export class ProductsService {
   }
 
   async getProductByUuid(uuid: string) {
-    return this.prismaService.product.findUnique({
-      where: { uuid: uuid },
+    const product = await this.prismaService.product.findUnique({
+      where: { uuid },
+      include: {
+        Brand: true,
+        Category: true,
+        ProductImages: true,
+      },
     });
+
+    return {
+      id: product.id,
+      uuid: product.uuid,
+      title: product.title,
+      price: product.price,
+      discountPrice: product.discountPrice,
+      quantity: product.quantity,
+      sold: product.sold,
+      smallDescription: product.smallDescription,
+      largeDescription: product.largeDescription,
+      specification: product.specification,
+      categoryId: product.categoryId,
+      brand: product.Brand,
+      category: product.Category,
+      images: product.ProductImages,
+    };
   }
   async getProductById(id: number) {
-    return this.prismaService.product.findUnique({
+    const product = await this.prismaService.product.findUnique({
       where: { id },
+      include: {
+        Brand: true,
+        Category: true,
+        ProductImages: true,
+      },
     });
+
+    return {
+      id: product.id,
+      uuid: product.uuid,
+      title: product.title,
+      price: product.price,
+      discountPrice: product.discountPrice,
+      quantity: product.quantity,
+      sold: product.sold,
+      smallDescription: product.smallDescription,
+      largeDescription: product.largeDescription,
+      specification: product.specification,
+      categoryId: product.categoryId,
+      brand: product.Brand,
+      category: product.Category,
+      images: product.ProductImages,
+    };
   }
   async createProduct() {
     return 'This action adds a new product';

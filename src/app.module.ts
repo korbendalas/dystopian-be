@@ -20,6 +20,7 @@ import { RBAC_POLICY } from './modules/auth/rbac-policy';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import type { ClientOpts } from 'redis';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import type { ClientOpts } from 'redis';
     MailerModule,
     UserModule,
     ProductsModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [
